@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "oidconv"
+version = "0.1.0"
+description = ""
+authors = ["naomori <naoki.morita@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+pandas = "^1.1.4"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.1.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
