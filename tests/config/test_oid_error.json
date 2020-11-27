@@ -9,7 +9,6 @@
     "val": "/loft/open_images_dataset_v6/files/validation-annotations-bbox.csv",
     "test": "/loft/open_images_dataset_v6/files/test-annotations-bbox.csv"
   },
-  "class_descriptions": "/loft/open_images_dataset_v6/files/class-descriptions-boxable.csv",
   "class_filter": {
     "train_and_val": [
       ["Vehicle registration plate"],
