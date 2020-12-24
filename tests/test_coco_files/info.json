@@ -1,0 +1,10 @@
+{
+  "info": {
+    "description": "Open Images Dataset V6 + Extensions",
+    "url": "https://storage.googleapis.com/openimages/web/index.html",
+    "version": "V6",
+    "year": 2020,
+    "contributor": "Google",
+    "date_created": "2020/02/26"
+  }
+}

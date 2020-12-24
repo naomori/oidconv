@@ -62,5 +62,17 @@
   },
   "required_class": [
     "Vehicle registration plate", "Human face"
-  ]
+  ],
+  "output": {
+    "images": {
+      "train": "/loft/open_images_dataset_v6/coco/images/train",
+      "val": "/loft/open_images_dataset_v6/coco/images/validation",
+      "test": "/loft/open_images_dataset_v6/coco/images/test"
+    },
+    "bounding_boxes": {
+      "train": "/loft/open_images_dataset_v6/coco/annotations/coco-oid-train-annotations.json",
+      "val": "/loft/open_images_dataset_v6/coco/annotations/coco-oid-validation-annotations.json",
+      "test": "/loft/open_images_dataset_v6/coco/annotations/coco-oid-test-annotations.json"
+    }
+  }
 }

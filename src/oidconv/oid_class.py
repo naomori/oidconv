@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 class OidClass(object):
     def __init__(self, class_desc_path: Optional[str] = None):
         self.class_desc_path = class_desc_path
-        self.df_class = None
+        self.df_class: Optional[pd.DataFrame] = None
 
     def read(self, class_desc_path: Optional[str] = None) -> None:
         try:
@@ -33,5 +33,16 @@ class OidClass(object):
             label_names = df_class_names['LabelName'].values.tolist()
             return label_names
         except Exception as e:
-            logger.error(f'action=read error={e}')
+            logger.error(f'action=conv2label error={e}')
+            raise
+
+    def label2class(self, label_name: str) -> str:
+        try:
+            if not any(self.df_class['LabelName'].isin([label_name])):
+                raise ValueError(f'{label_name} not found')
+            df_label_names = self.df_class[self.df_class['LabelName'].isin([label_name])]
+            class_names = df_label_names['ClassName'].values.tolist()
+            return class_names[0]
+        except Exception as e:
+            logger.error(f'action=conv2class error={e}')
             raise

@@ -7,6 +7,8 @@ authors = ["naomori <naoki.morita@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.8"
 pandas = "^1.1.4"
+Pillow = "^8.0.1"
+more-itertools = "^8.6.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.1.2"

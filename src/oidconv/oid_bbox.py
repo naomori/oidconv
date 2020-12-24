@@ -1,15 +1,21 @@
-import os
 from typing import List, Optional
 from pathlib import Path
+import os
+import subprocess
+import math
 import pandas as pd
+import numpy as np
 import concurrent.futures
 from concurrent.futures import ProcessPoolExecutor
 
 
 class OidBbox(object):
-    def __init__(self, bbox_path: str):
-        self.df = None
+    needed_columns = ["ImageID", "LabelName", "XMin", "XMax", "YMin", "YMax"]
+
+    def __init__(self, ds_type: int, bbox_path: str):
+        self.ds_type: int = ds_type
         self.bbox_path: str = bbox_path
+        self.df = pd.DataFrame(index=[], columns=OidBbox.needed_columns)
 
     def _check(self, bbox_path: Optional[str] = None):
         if bbox_path:
@@ -46,12 +52,12 @@ class OidBbox(object):
 
     def filter_with_label(self, label_filter: List, required_labels: List[str]) -> None:
         self._check()
-        chunk_size = 10000
+        line_count = int(subprocess.check_output(['wc', '-l', self.bbox_path]).decode().split(' ')[0])
+        chunk_size = max(10000, math.ceil(line_count / (os.cpu_count() * 10)))
         futures = []
         with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
             df_rest = None
-            needed_columns = ["ImageID", "LabelName", "XMin", "XMax", "YMin", "YMax"]
-            for index, df_bbox in enumerate(pd.read_csv(self.bbox_path, header=0, usecols=needed_columns,
+            for index, df_bbox in enumerate(pd.read_csv(self.bbox_path, header=0, usecols=OidBbox.needed_columns,
                                                         chunksize=chunk_size)):
                 df, df_last = self._split_last_df_image(df_bbox)
                 if df_rest is not None:
@@ -65,9 +71,16 @@ class OidBbox(object):
                     futures.append(future)
 
         concurrent.futures.wait(futures, timeout=None)
-        df_list = [future.result() for future in concurrent.futures.as_completed(futures)]
-        for df in df_list:
-            self.df = pd.concat([self.df, df])
+        for future in concurrent.futures.as_completed(futures):
+            self.df = pd.concat([self.df, future.result()])
+        self.df.reset_index(drop=True, inplace=True)
+
+    def each_image_iter(self):
+        for image_id, df_image in self.df.groupby("ImageID"):
+            yield image_id, df_image
 
     def backup_bbox_temp(self, backup_filename: str) -> None:
         self.df.to_csv(backup_filename, header=True, index=False, mode='w')
+
+    def get_image_id(self) -> np.ndarray:
+        return self.df["ImageID"].unique()

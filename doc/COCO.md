@@ -58,7 +58,7 @@ COCO Format は、以下の５つのパートで構成されています。
 * "contributor": "COCO Consortium",
 * "date_created": "2017/09/01"
 
-[Open Images Dataset V6 + Extensions]であれば以下の情報を記載します。
+[Open Images Dataset V6 + Extensions][]であれば以下の情報を記載します。
 
 * "description": "Open Images Dataset V6 + Extensions",
 * "url": "https://storage.googleapis.com/openimages/web/index.html",
@@ -78,7 +78,7 @@ COCO Format は、以下の５つのパートで構成されています。
 * "id": 1,
 * "name": "Attribution-NonCommercial-ShareAlike License"
 
-[Open Images Dataset V6 + Extensions]であれば以下のライセンス１つを記載します。
+[Open Images Dataset V6 + Extensions][]であれば以下のライセンス１つを記載します。
 
 * "url": "https://creativecommons.org/licenses/by/4.0/",
 * "id": 1,
@@ -103,9 +103,10 @@ COCO Format は、以下の５つのパートで構成されています。
 * "id": 397133
     - 画像ファイルの識別子
     
-[Open Images Dataset V6 + Extensions]であれば以下のように画像ファイルの情報を記載します。
+[Open Images Dataset V6 + Extensions][]であれば以下のように画像ファイルの情報を記載します。
 フリーで落ちている画像を拾ってきているわけではないので、urlの項目は持ちません。
 その他の項目は、JPEGヘッダ情報に含まれています。
+画像キャプチャ時刻は実際には用いられないので、厳密な正しさは必要ありません。
 
 * "license": 1,
     - ライセンス情報は`CC BY 4.0`の１つだけ。
@@ -143,22 +144,27 @@ COCO Format は、以下の５つのパートで構成されています。
 * "id": 1773
     - アノテーションの識別子
     
-[Open Images Dataset V6 + Extensions]であれば以下のようにアノテーション情報を記載します。
+[Open Images Dataset V6 + Extensions][]であれば以下のようにアノテーション情報を記載します。
 
 * "segmentation": 今回は`object detection`タスクなので省略します。 **なし**
 * "area": **なし**
 * "iscrowd": **なし**
-* "image_id": 0xe321a98048a49548
+* "image_id": 画像ファイルのID
 * "bbox": [ 473.07, 395.93, 38.65, 28.67 ]
     - バウンディングボックス `x, y, width, height` のpixel値として並んでいる
     - 注意点は x, y は左上の x_min, y_min であること。中心点ではない。
-    - [Open Images Dataset V6 + Extensions][]では、pixel値に対する比率なので注意すること。
+    - [Open Images Dataset V6 + Extensions][]では、バウンディングボックスの表現に
+        pixel値ではなく、pixel値に対する比率を用いているため注意すること。
 * "category_id": 18
     - カテゴリーの識別子(後述)
 * "id": 1773
     - 一意に識別できるアノテーションの識別子
     
 ### "categories": array (物体のカテゴリ種類)
+"categories"オブジェクトには、物体のカテゴリをリストで記載します。
+識別子は"1"から始まります。カテゴリは"supercategory"と"name"の2層構造になっています。
+特に階層構造がなければ、"supercategory"と"name"は同じ名前で構いません。
+
 * "supercategory": "vehicle",
     - カテゴリの親分類
 * "id": 2,
@@ -168,6 +174,9 @@ COCO Format は、以下の５つのパートで構成されています。
     - カテゴリの名前
     - 同じ `supercategory` に複数の名前が存在することもある
     - e.g. `vehicle` に対して `car`, `motorcycle`, `airplane`, etc.
+    
+[Open Images Dataset V6 + Extensions][]を使って、
+ユーザが自分のタスクに応用する場合は、検知対象となるオブジェクトを[Open Images Dataset V6 + Extensions][]から選び、"categories"にカテゴリを列挙します。
 
  - -
 # COCO API via python

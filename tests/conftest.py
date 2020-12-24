@@ -24,6 +24,8 @@ class TestOidGlobalVariables(object):
 @pytest.fixture()
 def global_variables():
     gv = TestOidGlobalVariables()
+    gv.test_config_path = "tests/config/test_oid.json"
+    gv.test_config_error_path = "tests/config/test_oid_error.json"
     gv.class_desc_path = "/loft/open_images_dataset_v6/files/class-descriptions-boxable.csv"
     gv.images_train_path = "/loft/open_images_dataset_v6/images/train"
     gv.images_val_path = "/loft/open_images_dataset_v6/images/validation"
@@ -87,6 +89,9 @@ def global_variables():
     gv.required_labels = [
         '/m/01jfm_', '/m/0dzct'
     ]
+
+    gv.coco_info_path = "tests/test_coco_files/info.json"
+    gv.coco_licenses_path = "tests/test_coco_files/licenses.json"
     return gv
 
 
