@@ -9,6 +9,10 @@ from concurrent.futures import ProcessPoolExecutor
 import numpy as np
 import pandas as pd
 
+from src.oidconv.oidconv_config import OidConvConfig
+from src.oidconv.oid import Oid
+from src.oidconv.oid_constants import *
+
 from src.oidconv.oid_class import OidClass
 from src.oidconv.oid_image import OidImages
 from src.oidconv.coco_image import CocoImage, CocoImages
@@ -24,11 +28,30 @@ class OidConv(object):
     coco_columns = ["AnnotationID", "CategoryID", "ImageID", "XMin", "YMin", "Width", "Height"]
 
     def __init__(self):
+        self.config = OidConvConfig()
+        self.oid = Oid()
+
         self.oid_images: Optional[OidImages] = None
         self.coco_images: Optional[CocoImages] = None
         self.coco_bbox = pd.DataFrame(index=[], columns=OidConv.coco_columns)
         self.oid_class: Optional[OidClass] = None
         self.coco_categories: Optional[CocoCategories] = None
+
+    def read_config(self, config_path: str) -> None:
+        self.config.read(config_path)
+
+    def build_oid(self):
+        if self.config is None:
+            raise ValueError(f'not yet call read_config()')
+
+        for ds_type in DATASET_TYPE_ALL:
+            bbox_path = self.config.get_bbox_path(ds_type)
+            label_filter = self.config.get_label_filter(ds_type)
+            required_labels = self.config.get_required_labels(ds_type)
+            self.oid.build_bbox(ds_type, bbox_path, label_filter, required_labels)
+
+            images_dir = self.config.get_image_dir(ds_type)
+            self.oid.build_image(ds_type, images_dir)
 
     def set(self, oid_class: OidClass, coco_categories: CocoCategories) -> None:
         self.oid_class: Optional[OidClass] = oid_class
@@ -138,7 +161,7 @@ class OidConv(object):
             logger.error(f'action=conv_bbox error={e}')
             raise
 
-    def anntations_json(self) -> Dict[str, List]:
+    def annotations_json(self) -> Dict[str, List]:
         try:
             annos_json = []
             df_split = np.array_split(self.coco_bbox, os.cpu_count())

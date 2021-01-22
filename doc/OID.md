@@ -64,7 +64,8 @@ Metadata の Class Names からダウンロードした
 1つのラベルだけというのは駄目で複数のラベルが必要だからです。
 
 検知したいものは、`Metadata`の`Class Names`のファイルで選んでおきます。
-```bash
+
+```csv
 /m/01jfm_,Vehicle registration plate
 /m/04_sv,Motorcycle
 /m/0k4j,Car

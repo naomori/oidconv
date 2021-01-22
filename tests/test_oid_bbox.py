@@ -1,71 +1,50 @@
-from typing import Tuple
-from src.oidconv.oid_config_obj import *
-from src.oidconv.oid_bbox import *
+import pytest
+
 from src.oidconv.oid_constants import *
+from src.oidconv.oidconv_config import OidConvConfig
+from src.oidconv.oid_bbox import OidBbox
 
 
 class TestOidBbox(object):
 
-    def test_oid_bbox_all(self, global_variables, oid_class_default):
+    @pytest.fixture()
+    def get_config(self):
+        def _config(config_path):
+            config = OidConvConfig()
+            config.read(config_path)
+            return config
+        return _config
 
-        def get_path(dst: int) -> Optional[Tuple[str, str, List[List[str]]]]:
-            if dst == DATASET_TYPE_VAL:
-                return global_variables.images_val_path,\
-                       global_variables.bbox_val_path, \
-                       global_variables.class_filter_train_and_val
-            elif dst == DATASET_TYPE_TRAIN:
-                return global_variables.images_train_path, \
-                       global_variables.bbox_train_path, \
-                       global_variables.class_filter_train_and_val
-            elif dst == DATASET_TYPE_TEST:
-                return global_variables.images_test_path, \
-                       global_variables.bbox_test_path, \
-                       global_variables.class_filter_test
-            else:
-                return None
+    def test_oid_bbox_constructor(self, global_variables, get_config):
+        config = get_config(global_variables.test_config_path)
+        for ds_type in DATASET_TYPE_ALL:
+            bbox_path = config.get_bbox_path(ds_type)
+            bbox = OidBbox(ds_type, bbox_path)
+            assert bbox
+            assert bbox.ds_type == ds_type
+            assert bbox.bbox_path == bbox_path
 
+    @pytest.fixture
+    def create_bbox(self):
+        def _bbox(config, ds_type):
+            bbox_path = config.get_bbox_path(ds_type)
+            bbox = OidBbox(ds_type, bbox_path)
+            return bbox
+        return _bbox
+
+    def test_oid_bbox_all(self, global_variables, get_config, create_bbox):
+        config = get_config(global_variables.test_config_path)
         for ds_type in DATASET_TYPE_ALL:
             if ds_type != DATASET_TYPE_VAL:
                 continue
-            conf_obj = OidConfigObject(ds_type)
-            images_path, val_path, class_filter = get_path(ds_type)
-            conf_obj.set(ds_type, images_path, val_path, oid_class_default, class_filter,
-                         global_variables.required_class)
+            bbox = create_bbox(config, ds_type)
 
-            oid_bbox = OidBbox(ds_type, val_path)
-            label_filter = conf_obj.create_label_filter()
-            oid_bbox.filter_with_label(label_filter, global_variables.required_labels)
+            label_filter = config.get_label_filter(ds_type)
+            required_labels = config.get_required_labels(ds_type)
+            bbox.filter_with_label(label_filter, required_labels)
 
-#    def test_oid_bbox_val(self, global_variables, oid_class_default):
-#        val_obj = OidConfigObject(DATASET_TYPE_VAL)
-#        val_obj.set(DATASET_TYPE_VAL, global_variables.images_val_path, global_variables.bbox_val_path,
-#                    oid_class_default,
-#                    global_variables.class_filter_train_and_val, global_variables.required_class)
-#
-#        val_bbox = OidBbox(DATASET_TYPE_VAL, global_variables.bbox_val_path)
-#        val_label_filter = val_obj.create_label_filter()
-#        val_bbox.filter_with_label(val_label_filter, global_variables.required_labels)
-#        # val_bbox.backup_bbox_temp("/tmp/hoge_val.csv")
-#
-#    def test_oid_bbox_train(self, global_variables, oid_class_default):
-#        train_obj = OidConfigObject(DATASET_TYPE_TRAIN)
-#        train_obj.set(DATASET_TYPE_TRAIN, global_variables.images_train_path, global_variables.bbox_train_path,
-#                      oid_class_default,
-#                      global_variables.class_filter_train_and_val, global_variables.required_class)
-#
-#        train_bbox = OidBbox(DATASET_TYPE_TRAIN, global_variables.bbox_train_path)
-#        train_label_filter = train_obj.create_label_filter()
-#        train_bbox.filter_with_label(train_label_filter, global_variables.required_labels)
-#        # train_bbox.backup_bbox_temp("/tmp/hoge_train.csv")
-#
-#    def test_oid_bbox_test(self, global_variables, oid_class_default):
-#        test_obj = OidConfigObject(DATASET_TYPE_TEST)
-#        test_obj.set(DATASET_TYPE_TEST, global_variables.images_test_path, global_variables.bbox_test_path,
-#                     oid_class_default,
-#                     global_variables.class_filter_test, global_variables.required_class)
-#
-#        test_bbox = OidBbox(DATASET_TYPE_TEST, global_variables.bbox_test_path)
-#        test_label_filter = test_obj.create_label_filter()
-#        test_bbox.filter_with_label(test_label_filter, global_variables.required_labels)
-#        # test_bbox.backup_bbox_temp("/tmp/hoge_test.csv")
-#
+            columns = bbox.needed_columns
+            for column in columns:
+                assert column in bbox.df.columns
+            assert len(bbox.df) > 0
+            print(bbox.df.head(5))

@@ -19,3 +19,15 @@ def dataset_type2str(ds_type: int) -> str:
         return DATASET_STR_TEST
     else:
         raise TypeError(f'ds_type:{ds_type} is invalid')
+
+
+def dataset_str2type(ds_str: str) -> int:
+    """convert dataset type from string"""
+    if ds_str == DATASET_STR_TRAIN:
+        return DATASET_TYPE_TRAIN
+    elif ds_str == DATASET_STR_VAL:
+        return DATASET_TYPE_VAL
+    elif ds_str == DATASET_STR_TEST:
+        return DATASET_TYPE_TEST
+    else:
+        raise TypeError(f'ds_str:{ds_str} is invalid')

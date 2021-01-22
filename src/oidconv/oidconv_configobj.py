@@ -2,7 +2,7 @@ from src.oidconv.oid_class import *
 from typing import List, Optional
 
 
-class OidConfigObject(object):
+class OidConvConfigObj(object):
     def __init__(self, ds_type: int):
         self.ds_type: int = ds_type
         self.images_path: str = ""

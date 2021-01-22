@@ -3,7 +3,7 @@ from src.oidconv.coco_category import CocoCategories
 from src.oidconv.coco_image import CocoImages
 from src.oidconv.oid import Oid
 from src.oidconv.oid_class import OidClass
-from src.oidconv.oid_conv import OidConv
+from src.oidconv.oidconv import OidConv
 from src.oidconv.oid_image import OidImages
 from src.oidconv.oid_constants import *
 
@@ -134,6 +134,11 @@ class TestCoco(object):
         print(conv.coco_bbox.head(5))
         print(conv.coco_bbox.tail(5))
 
-        annotions_json = conv.anntations_json()
-        assert annotions_json
-        assert len(annotions_json["annotations"]) == len(conv.coco_bbox)
+        annotations_json = conv.annotations_json()
+        assert annotations_json
+        assert len(annotations_json["annotations"]) == len(conv.coco_bbox)
+        print(f'the number of bbox: {len(annotations_json["annotations"])}')
+        for i in range(5):
+            print(annotations_json["annotations"][i])
+        for i in range(1, 6):
+            print(annotations_json["annotations"][-i])

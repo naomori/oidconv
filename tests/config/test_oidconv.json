@@ -10,6 +10,7 @@
     "test": "/loft/open_images_dataset_v6/files/test-annotations-bbox.csv"
   },
   "class_descriptions": "/loft/open_images_dataset_v6/files/class-descriptions-boxable.csv",
+
   "class_filter": {
     "train_and_val": [
       ["Vehicle registration plate"],
@@ -63,6 +64,10 @@
   "required_class": [
     "Vehicle registration plate", "Human face"
   ],
+  "mixed_dataset": {
+    "train": 0.8, "val": 0.2
+  },
+
   "output": {
     "images": {
       "train": "/loft/open_images_dataset_v6/coco/images/train",
